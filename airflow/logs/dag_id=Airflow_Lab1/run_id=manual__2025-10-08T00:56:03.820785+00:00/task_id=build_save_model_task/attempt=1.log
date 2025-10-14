@@ -1,0 +1,23 @@
+[2025-10-08T00:56:08.624+0000] {taskinstance.py:1083} INFO - Dependencies all met for <TaskInstance: Airflow_Lab1.build_save_model_task manual__2025-10-08T00:56:03.820785+00:00 [queued]>
+[2025-10-08T00:56:08.629+0000] {taskinstance.py:1083} INFO - Dependencies all met for <TaskInstance: Airflow_Lab1.build_save_model_task manual__2025-10-08T00:56:03.820785+00:00 [queued]>
+[2025-10-08T00:56:08.629+0000] {taskinstance.py:1279} INFO - 
+--------------------------------------------------------------------------------
+[2025-10-08T00:56:08.630+0000] {taskinstance.py:1280} INFO - Starting attempt 1 of 1
+[2025-10-08T00:56:08.630+0000] {taskinstance.py:1281} INFO - 
+--------------------------------------------------------------------------------
+[2025-10-08T00:56:08.636+0000] {taskinstance.py:1300} INFO - Executing <Task(PythonOperator): build_save_model_task> on 2025-10-08 00:56:03.820785+00:00
+[2025-10-08T00:56:08.639+0000] {standard_task_runner.py:55} INFO - Started process 307 to run task
+[2025-10-08T00:56:08.641+0000] {standard_task_runner.py:82} INFO - Running: ['***', 'tasks', 'run', 'Airflow_Lab1', 'build_save_model_task', 'manual__2025-10-08T00:56:03.820785+00:00', '--job-id', '5', '--raw', '--subdir', 'DAGS_FOLDER/***.py', '--cfg-path', '/tmp/tmpdjej8p0g']
+[2025-10-08T00:56:08.642+0000] {standard_task_runner.py:83} INFO - Job 5: Subtask build_save_model_task
+[2025-10-08T00:56:08.671+0000] {task_command.py:388} INFO - Running <TaskInstance: Airflow_Lab1.build_save_model_task manual__2025-10-08T00:56:03.820785+00:00 [running]> on host 69014d4fcacb
+[2025-10-08T00:56:08.734+0000] {taskinstance.py:1509} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=your_name
+AIRFLOW_CTX_DAG_ID=Airflow_Lab1
+AIRFLOW_CTX_TASK_ID=build_save_model_task
+AIRFLOW_CTX_EXECUTION_DATE=2025-10-08T00:56:03.820785+00:00
+AIRFLOW_CTX_TRY_NUMBER=1
+AIRFLOW_CTX_DAG_RUN_ID=manual__2025-10-08T00:56:03.820785+00:00
+[2025-10-08T00:56:50.738+0000] {python.py:177} INFO - Done. Returned value was: [250.32804209291436, 128.89457877623192, 91.64833975738141, 72.4692153244092, 59.86140695977855, 52.0620423750911, 46.71118654804302, 41.503264751671416, 36.9282370939197, 33.986075968719675, 31.158171667913756, 28.84548003205872, 26.8744322961113, 25.99951236994563, 24.185078072393758, 22.71395006172973, 21.64008732398112, 20.78030480822549, 19.976783465801397, 19.438669340270895, 19.06639931435457, 18.446853884604554, 17.947211161985983, 16.898807424877255, 16.963181977976234, 16.582840757316497, 15.835651544091544, 15.775551490572006, 15.3855073175332, 15.020243180409228, 14.882873240965239, 14.60768698430239, 14.306186090616873, 13.89161473345485, 13.805485778871228, 13.361866184299295, 13.36789085752107, 13.073601934790835, 12.981196891357621, 13.028578398100313, 12.867008418863989, 12.617297944046323, 12.382973425034512, 12.112634671228028, 11.83653914221833, 11.577385920665519, 11.128836068114499, 11.062804545149202, 11.158174940252103]
+[2025-10-08T00:56:50.766+0000] {taskinstance.py:1323} INFO - Marking task as SUCCESS. dag_id=Airflow_Lab1, task_id=build_save_model_task, execution_date=20251008T005603, start_date=20251008T005608, end_date=20251008T005650
+[2025-10-08T00:56:50.816+0000] {local_task_job.py:208} INFO - Task exited with return code 0
+[2025-10-08T00:56:50.842+0000] {taskinstance.py:2578} INFO - 1 downstream tasks scheduled from follow-on schedule check
