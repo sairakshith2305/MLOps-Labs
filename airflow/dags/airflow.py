@@ -1,72 +1,41 @@
+"""
+Airflow DAG to run Iris model training and evaluation pipeline.
+"""
 import sys
-import os
-
 sys.path.append('/opt/airflow/src')
-
-# Import necessary libraries and modules
 from airflow import DAG
-from airflow.operators.python_operator import PythonOperator
+from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
-from lab import load_data, data_preprocessing, build_save_model,load_model_elbow
+from lab import run_pipeline
 
-from airflow import configuration as conf
-
-# Enable pickle support for XCom, allowing data to be passed between tasks
-conf.set('core', 'enable_xcom_pickling', 'True')
-
-# Define default arguments for your DAG
 default_args = {
-    'owner': 'your_name',
-    'start_date': datetime(2025, 1, 15),
-    'retries': 0, # Number of retries in case of task failure
-    'retry_delay': timedelta(minutes=5), # Delay before retries
+    "owner": "airflow",
+    "depends_on_past": False,
+    "retries": 1,
+    "retry_delay": timedelta(minutes=5),
 }
 
-# Create a DAG instance named 'Airflow_Lab1' with the defined default arguments
-dag = DAG(
-    'Airflow_Lab1',
+
+def iris_training_callable(**kwargs):
+    print("[DAG] Starting Iris training pipeline...")
+    metrics_path = run_pipeline(output_dir="/opt/airflow/model")
+    print(f"[DAG] Pipeline complete. Metrics saved at: {metrics_path}")
+    return metrics_path
+
+
+with DAG(
+    dag_id="iris_training_pipeline",
     default_args=default_args,
-    description='Dag example for Lab 1 of Airflow series',
-    schedule_interval=None,  # Set the schedule interval or use None for manual triggering
+    description="Train, evaluate, and save multiple Iris models",
+    schedule_interval=None,
+    start_date=datetime(2025, 10, 1),
     catchup=False,
-)
+) as dag:
 
-# Define PythonOperators for each function
+    train_task = PythonOperator(
+        task_id="train_and_evaluate_models",
+        python_callable=iris_training_callable,
+        provide_context=True,
+    )
 
-# Task to load data, calls the 'load_data' Python function
-load_data_task = PythonOperator(
-    task_id='load_data_task',
-    python_callable=load_data,
-    dag=dag,
-)
-# Task to perform data preprocessing, depends on 'load_data_task'
-data_preprocessing_task = PythonOperator(
-    task_id='data_preprocessing_task',
-    python_callable=data_preprocessing,
-    op_args=[load_data_task.output],
-    dag=dag,
-)
-# Task to build and save a model, depends on 'data_preprocessing_task'
-build_save_model_task = PythonOperator(
-    task_id='build_save_model_task',
-    python_callable=build_save_model,
-    op_args=[data_preprocessing_task.output, "model.sav"],
-    provide_context=True,
-    dag=dag,
-)
-# Task to load a model using the 'load_model_elbow' function, depends on 'build_save_model_task'
-load_model_task = PythonOperator(
-    task_id='load_model_task',
-    python_callable=load_model_elbow,
-    op_args=["model.sav", build_save_model_task.output],
-    dag=dag,
-)
-
-
-
-# Set task dependencies
-load_data_task >> data_preprocessing_task >> build_save_model_task >> load_model_task
-
-# If this script is run directly, allow command-line interaction with the DAG
-if __name__ == "__main__":
-    dag.cli()
+    train_task

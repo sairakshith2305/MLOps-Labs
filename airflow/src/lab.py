@@ -1,101 +1,96 @@
-import pandas as pd
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.cluster import KMeans
-from kneed import KneeLocator
-import pickle
 import os
+import json
+import joblib
+from typing import Dict, Any
+
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
 
 
+# Loading the  Dataset
 def load_data():
-    """
-    Loads data from a CSV file, serializes it, and returns the serialized data.
-
-    Returns:
-        bytes: Serialized data.
-    """
-
-    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "../data/file.csv"))
-    serialized_data = pickle.dumps(df)
-    
-    return serialized_data
-    
-
-def data_preprocessing(data):
-
-    """
-    Deserializes data, performs data preprocessing, and returns serialized clustered data.
-
-    Args:
-        data (bytes): Serialized data to be deserialized and processed.
-
-    Returns:
-        bytes: Serialized clustered data.
-    """
-    df = pickle.loads(data)
-    df = df.dropna()
-    clustering_data = df[["BALANCE", "PURCHASES", "CREDIT_LIMIT"]]
-    min_max_scaler = MinMaxScaler()
-    clustering_data_minmax = min_max_scaler.fit_transform(clustering_data)
-    clustering_serialized_data = pickle.dumps(clustering_data_minmax)
-    return clustering_serialized_data
+    data = load_iris()
+    X, y = data.data, data.target
+    print("[INFO] Dataset loaded successfully.")
+    return X, y, data.feature_names, data.target_names
 
 
-def build_save_model(data, filename):
-    """
-    Builds a KMeans clustering model, saves it to a file, and returns SSE values.
-
-    Args:
-        data (bytes): Serialized data for clustering.
-        filename (str): Name of the file to save the clustering model.
-
-    Returns:
-        list: List of SSE (Sum of Squared Errors) values for different numbers of clusters.
-    """
-    df = pickle.loads(data)
-    kmeans_kwargs = {"init": "random","n_init": 10,"max_iter": 300,"random_state": 42,}
-    sse = []
-    for k in range(1, 50):
-        kmeans = KMeans(n_clusters=k, **kmeans_kwargs)
-        kmeans.fit(df)
-        sse.append(kmeans.inertia_)
-    
-    output_dir = os.path.join(os.path.dirname(os.path.dirname(__file__)), "model")
-    # Create the model directory if it doesn't exist
-    os.makedirs(output_dir, exist_ok=True)
-    
-    output_path = os.path.join(output_dir, filename)
-
-    # Save the trained model to a file
-    with open(output_path, 'wb') as f:
-        pickle.dump(kmeans, f)
-    return sse
-
-def load_model_elbow(filename,sse):
-    """
-    Loads a saved KMeans clustering model and determines the number of clusters using the elbow method.
-
-    Args:
-        filename (str): Name of the file containing the saved clustering model.
-        sse (list): List of SSE values for different numbers of clusters.
-
-    Returns:
-        str: A string indicating the predicted cluster and the number of clusters based on the elbow method.
-    """
-    
-    output_path = os.path.join(os.path.dirname(__file__), "../model", filename)
-    # Load the saved model from a file
-    loaded_model = pickle.load(open(output_path, 'rb'))
-
-    df = pd.read_csv(os.path.join(os.path.dirname(__file__), "../data/test.csv"))
-    
-    kl = KneeLocator(
-        range(1, 50), sse, curve="convex", direction="decreasing"
+# Preprocessing the dataset
+def preprocess_data(X, y, test_size=0.2, random_state=42):
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=test_size, random_state=random_state, stratify=y
     )
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    print("[INFO] Data preprocessed")
+    return X_train_scaled, X_test_scaled, y_train, y_test, scaler
 
-    # Optimal clusters
-    print(f"Optimal no. of clusters: {kl.elbow}")
 
-    # Make predictions on the test data
-    predictions = loaded_model.predict(df)
-    
-    return predictions[0]
+# Training Multiple Models
+def train_models(X_train, y_train):
+    models = {
+        "logistic_regression": LogisticRegression(max_iter=1000, random_state=42),
+        "random_forest": RandomForestClassifier(n_estimators=100, random_state=42),
+        "svm": SVC(kernel="rbf", probability=True, random_state=42),
+    }
+
+    trained_models = {}
+    for name, model in models.items():
+        model.fit(X_train, y_train)
+        trained_models[name] = model
+        print(f"[INFO] Trained model: {name}")
+    return trained_models
+
+
+# Evaluate the trained Models
+def evaluate_models(models, X_test, y_test) -> Dict[str, Any]:
+    results = {}
+    for name, model in models.items():
+        y_pred = model.predict(X_test)
+        results[name] = {
+            "accuracy": float(accuracy_score(y_test, y_pred)),
+            "precision": float(precision_score(y_test, y_pred, average="macro")),
+            "recall": float(recall_score(y_test, y_pred, average="macro")),
+            "f1_score": float(f1_score(y_test, y_pred, average="macro")),
+        }
+        print(f"[INFO] Evaluation for {name}: {results[name]}")
+    return results
+
+
+# Save Models with their respective metrics
+def save_artifacts(models, metrics, scaler, output_dir="model"):
+    os.makedirs(output_dir, exist_ok=True)
+
+    for name, model in models.items():
+        path = os.path.join(output_dir, f"{name}.joblib")
+        joblib.dump(model, path)
+
+    scaler_path = os.path.join(output_dir, "scaler.joblib")
+    joblib.dump(scaler, scaler_path)
+
+    metrics_path = os.path.join(output_dir, "metrics.json")
+    with open(metrics_path, "w") as f:
+        json.dump(metrics, f, indent=2)
+
+    print(f"[INFO] Saved models, scaler, and metrics to {output_dir}")
+    return metrics_path
+
+
+# Pipeline Orchestration
+def run_pipeline(output_dir="artifacts"):
+    X, y, feature_names, target_names = load_data()
+    X_train, X_test, y_train, y_test, scaler = preprocess_data(X, y)
+    trained_models = train_models(X_train, y_train)
+    metrics = evaluate_models(trained_models, X_test, y_test)
+    metrics_path = save_artifacts(trained_models, metrics, scaler, output_dir)
+    return metrics_path
+
+
+if __name__ == "__main__":
+    run_pipeline()
