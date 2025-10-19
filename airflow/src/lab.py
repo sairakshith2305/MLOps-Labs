@@ -82,15 +82,5 @@ def save_artifacts(models, metrics, scaler, output_dir="model"):
     return metrics_path
 
 
-# Pipeline Orchestration
-def run_pipeline(output_dir="artifacts"):
-    X, y, feature_names, target_names = load_data()
-    X_train, X_test, y_train, y_test, scaler = preprocess_data(X, y)
-    trained_models = train_models(X_train, y_train)
-    metrics = evaluate_models(trained_models, X_test, y_test)
-    metrics_path = save_artifacts(trained_models, metrics, scaler, output_dir)
-    return metrics_path
-
-
 if __name__ == "__main__":
     run_pipeline()

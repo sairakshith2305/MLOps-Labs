@@ -1,5 +1,5 @@
 """
-Airflow DAG to run Iris model training and evaluation pipeline.
+Airflow DAG to run Iris model training and evaluation of pipeline.
 """
 import sys
 sys.path.append('/opt/airflow/src')
@@ -22,14 +22,9 @@ os.makedirs(TEMP_DIR, exist_ok=True)
 
 
 def load_data_callable(**kwargs):
-    print("[DAG] Loading dataset...")
     X, y, feature_names, target_names = load_data()
-    
-    # Save to temporary files
     joblib.dump(X, os.path.join(TEMP_DIR, 'X.joblib'))
     joblib.dump(y, os.path.join(TEMP_DIR, 'y.joblib'))
-    
-    # Push metadata to XCom
     ti = kwargs['ti']
     ti.xcom_push(key='feature_names', value=feature_names)
     ti.xcom_push(key='target_names', value=target_names.tolist())
@@ -39,26 +34,19 @@ def load_data_callable(**kwargs):
 def preprocess_data_callable(**kwargs):
     X = joblib.load(os.path.join(TEMP_DIR, 'X.joblib'))
     y = joblib.load(os.path.join(TEMP_DIR, 'y.joblib'))
-    
     X_train, X_test, y_train, y_test, scaler = preprocess_data(X, y)
-    
-    # Save preprocessed data and scaler to temporary files
     joblib.dump(X_train, os.path.join(TEMP_DIR, 'X_train.joblib'))
     joblib.dump(X_test, os.path.join(TEMP_DIR, 'X_test.joblib'))
     joblib.dump(y_train, os.path.join(TEMP_DIR, 'y_train.joblib'))
     joblib.dump(y_test, os.path.join(TEMP_DIR, 'y_test.joblib'))
-    joblib.dump(scaler, os.path.join(TEMP_DIR, 'scaler.joblib'))
-    
+    joblib.dump(scaler, os.path.join(TEMP_DIR, 'scaler.joblib'))    
     print("[DAG] Data preprocessed and saved to temp directory")
-
 
 def train_models_callable(**kwargs):
     X_train = joblib.load(os.path.join(TEMP_DIR, 'X_train.joblib'))
     y_train = joblib.load(os.path.join(TEMP_DIR, 'y_train.joblib'))
-    
     trained_models = train_models(X_train, y_train)
     joblib.dump(trained_models, os.path.join(TEMP_DIR, 'trained_models.joblib'))
-    
     print("[DAG] Models trained and saved to temp directory")
 
 
