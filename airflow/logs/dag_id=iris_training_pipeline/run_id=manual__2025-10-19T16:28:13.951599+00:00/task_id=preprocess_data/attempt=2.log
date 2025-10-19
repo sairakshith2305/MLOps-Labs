@@ -1,0 +1,35 @@
+[2025-10-19T16:33:20.126+0000] {taskinstance.py:1083} INFO - Dependencies all met for <TaskInstance: iris_training_pipeline.preprocess_data manual__2025-10-19T16:28:13.951599+00:00 [queued]>
+[2025-10-19T16:33:20.133+0000] {taskinstance.py:1083} INFO - Dependencies all met for <TaskInstance: iris_training_pipeline.preprocess_data manual__2025-10-19T16:28:13.951599+00:00 [queued]>
+[2025-10-19T16:33:20.133+0000] {taskinstance.py:1279} INFO - 
+--------------------------------------------------------------------------------
+[2025-10-19T16:33:20.133+0000] {taskinstance.py:1280} INFO - Starting attempt 2 of 2
+[2025-10-19T16:33:20.133+0000] {taskinstance.py:1281} INFO - 
+--------------------------------------------------------------------------------
+[2025-10-19T16:33:20.141+0000] {taskinstance.py:1300} INFO - Executing <Task(PythonOperator): preprocess_data> on 2025-10-19 16:28:13.951599+00:00
+[2025-10-19T16:33:20.147+0000] {standard_task_runner.py:55} INFO - Started process 102 to run task
+[2025-10-19T16:33:20.152+0000] {standard_task_runner.py:82} INFO - Running: ['***', 'tasks', 'run', 'iris_training_pipeline', 'preprocess_data', 'manual__2025-10-19T16:28:13.951599+00:00', '--job-id', '272', '--raw', '--subdir', 'DAGS_FOLDER/***.py', '--cfg-path', '/tmp/tmp6dzpnex0']
+[2025-10-19T16:33:20.153+0000] {standard_task_runner.py:83} INFO - Job 272: Subtask preprocess_data
+[2025-10-19T16:33:20.204+0000] {task_command.py:388} INFO - Running <TaskInstance: iris_training_pipeline.preprocess_data manual__2025-10-19T16:28:13.951599+00:00 [running]> on host 4a1f5946dafc
+[2025-10-19T16:33:20.260+0000] {taskinstance.py:1509} INFO - Exporting the following env vars:
+AIRFLOW_CTX_DAG_OWNER=***
+AIRFLOW_CTX_DAG_ID=iris_training_pipeline
+AIRFLOW_CTX_TASK_ID=preprocess_data
+AIRFLOW_CTX_EXECUTION_DATE=2025-10-19T16:28:13.951599+00:00
+AIRFLOW_CTX_TRY_NUMBER=2
+AIRFLOW_CTX_DAG_RUN_ID=manual__2025-10-19T16:28:13.951599+00:00
+[2025-10-19T16:33:20.261+0000] {logging_mixin.py:137} INFO - [DAG] Preprocessing data...
+[2025-10-19T16:33:20.261+0000] {taskinstance.py:1768} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/python.py", line 175, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.7/site-packages/airflow/operators/python.py", line 192, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/airflow.py", line 86, in preprocess_data_callable
+    X = joblib.load(os.path.join(TEMP_DIR, 'X.joblib'))
+  File "/home/airflow/.local/lib/python3.7/site-packages/joblib/numpy_pickle.py", line 650, in load
+    with open(filename, 'rb') as f:
+FileNotFoundError: [Errno 2] No such file or directory: '/opt/airflow/temp/X.joblib'
+[2025-10-19T16:33:20.267+0000] {taskinstance.py:1323} INFO - Marking task as FAILED. dag_id=iris_training_pipeline, task_id=preprocess_data, execution_date=20251019T162813, start_date=20251019T163320, end_date=20251019T163320
+[2025-10-19T16:33:20.278+0000] {standard_task_runner.py:105} ERROR - Failed to execute job 272 for task preprocess_data ([Errno 2] No such file or directory: '/opt/airflow/temp/X.joblib'; 102)
+[2025-10-19T16:33:20.293+0000] {local_task_job.py:208} INFO - Task exited with return code 1
+[2025-10-19T16:33:20.309+0000] {taskinstance.py:2578} INFO - 0 downstream tasks scheduled from follow-on schedule check
