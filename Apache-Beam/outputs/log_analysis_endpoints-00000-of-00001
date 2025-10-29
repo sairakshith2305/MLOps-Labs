@@ -1,0 +1,4 @@
+/api/users: 4 requests
+/api/login: 2 requests
+/api/products: 3 requests
+/api/orders: 3 requests
