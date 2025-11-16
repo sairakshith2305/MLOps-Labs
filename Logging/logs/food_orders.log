@@ -1,0 +1,15 @@
+2025-11-16 00:03:17,081 - INFO - File logging enabled
+2025-11-16 00:03:17,092 - WARNING - Maintenance mode ON - only showing WARNING+
+2025-11-16 00:03:17,093 - INFO - Maintenance mode OFF - showing all logs
+2025-11-16 00:03:17,108 - DEBUG - This DEBUG goes to FILE only (not console)
+2025-11-16 00:03:17,108 - INFO - This INFO goes to BOTH console and file
+2025-11-16 00:03:17,109 - WARNING - This WARNING also goes to BOTH
+2025-11-16 00:03:33,916 - DEBUG - Attempting to add 'pizza' to cart
+2025-11-16 00:03:33,917 - INFO - Added pizza to cart (Cart size: 11)
+2025-11-16 00:03:33,919 - WARNING - Large order detected: 11 items in cart
+2025-11-16 00:03:33,921 - DEBUG - Attempting to add 'burger' to cart
+2025-11-16 00:03:33,921 - INFO - Added burger to cart (Cart size: 12)
+2025-11-16 00:03:33,922 - WARNING - Large order detected: 12 items in cart
+2025-11-16 00:03:33,923 - DEBUG - Attempting to add 'pasta' to cart
+2025-11-16 00:03:33,924 - INFO - Added pasta to cart (Cart size: 13)
+2025-11-16 00:03:33,924 - WARNING - Large order detected: 13 items in cart
