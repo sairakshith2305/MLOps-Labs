@@ -1,0 +1,20 @@
+# Use an official Python runtime as a parent image
+FROM python:3.9-slim
+
+# Set the working directory in the container
+WORKDIR /app
+
+# Copy the requirements file first (for better caching)
+COPY src/requirements.txt .
+
+# Install dependencies
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copy the source code
+COPY src/ .
+
+# Set environment variable for better output visibility
+ENV PYTHONUNBUFFERED=1
+
+# Run the training script when container launches
+CMD ["python", "train_model.py"]
